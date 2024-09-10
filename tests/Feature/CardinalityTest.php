@@ -2,8 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Models\Category;
 use App\Models\Customer;
+use App\Models\Product;
+use Database\Seeders\CategorySeeder;
 use Database\Seeders\CustomerSeeder;
+use Database\Seeders\ProductSeeder;
 use Database\Seeders\WalletSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -16,6 +20,8 @@ class CardinalityTest extends TestCase
     {
         parent::setUp();
 
+        DB::delete('DELETE FROM products');
+        DB::delete('DELETE FROM categories');
         DB::delete('DELETE FROM wallets');
         DB::delete('DELETE FROM customers');
     }
@@ -36,4 +42,36 @@ class CardinalityTest extends TestCase
 
 
     }
+
+    public function testQueryCategory()
+    {
+
+        $this->seed(CategorySeeder::class);
+        $this->seed(ProductSeeder::class);
+
+        $category = Category::query()->find("FOOD");
+        self::assertNotNull($category);
+
+        $products = $category->products;
+        self::assertNotNull($category);
+
+
+
+    }
+
+    public function testQueryProducts()
+    {
+
+        $this->seed(CategorySeeder::class);
+        $this->seed(ProductSeeder::class);
+
+        $products = Product::query()->find("1");
+        self::assertNotNull($products);
+
+        $category = $products->categories;
+        self::assertNotNull($category);
+
+    }
+
+
 }
