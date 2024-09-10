@@ -5,14 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
-class Wallet extends Model
+class Like extends Pivot
 {
-    protected $table = 'wallets';
-    protected $primaryKey = 'id';
-    protected $keyType = 'string';
-    public $incrementing = false;
+    protected $table = "costumers_likes_products";
+    protected $foreignKey = 'customer_id';
+
+    protected $relatedKey = "product_id";
     public $timestamps = false;
 
     public function customer(): BelongsTo
@@ -20,8 +20,8 @@ class Wallet extends Model
         return $this->belongsTo(Customer::class, 'customer_id', 'id');
     }
 
-    public function virtualAccount(): HasOne
+    public function product(): BelongsTo
     {
-        return $this->hasOne(VirtualAccount::class, 'wallet_id', 'id');
+        return $this->belongsTo(Product::class, 'product_id', 'id');
     }
 }

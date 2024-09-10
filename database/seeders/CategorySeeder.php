@@ -20,5 +20,13 @@ class CategorySeeder extends Seeder
         $category->is_active = true;
 
         $category->save();
+
+        $category = new Category();
+        $category->id = "LINGERIE";
+        $category->name = "Lingerie";
+        $category->description = "Lingerie Category";
+        $category->is_active = true;
+
+        $category->save();
     }
 }
