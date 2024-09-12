@@ -9,6 +9,6 @@ select * from products;
 select * from customers_likes_products;
 select * from images;
 
-desc vouchers;
+desc comments;
 
 show tables;

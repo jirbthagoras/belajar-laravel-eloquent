@@ -5,14 +5,18 @@ namespace Tests\Feature;
 use App\Models\Category;
 use App\Models\Customer;
 use App\Models\Product;
+use App\Models\Voucher;
 use App\Models\Wallet;
 use Cassandra\Custom;
 use Database\Seeders\CategorySeeder;
+use Database\Seeders\CommentSeeder;
 use Database\Seeders\CustomerSeeder;
 use Database\Seeders\ImageSeeder;
 use Database\Seeders\ProductSeeder;
 use Database\Seeders\ReviewSeeder;
+use Database\Seeders\TagSeeder;
 use Database\Seeders\VirtualAccountSeeder;
+use Database\Seeders\VoucherSeeder;
 use Database\Seeders\WalletSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -29,6 +33,9 @@ class CardinalityTest extends TestCase
         parent::setUp();
 
 
+        DB::delete('delete from taggables');
+        DB::delete('delete from tags');
+        DB::delete('delete from comments');
         DB::delete('delete from images');
         DB::delete('delete from customers_likes_products');
         DB::delete('DELETE FROM reviews');
@@ -302,6 +309,41 @@ class CardinalityTest extends TestCase
         $product->image();
 
         self::assertNotNull($product);
+
+    }
+
+    public function testOneToManyPolymorphic()
+    {
+
+        $this->seed([CategorySeeder::class, ProductSeeder::class, VoucherSeeder::class, CommentSeeder::class]);
+
+        $voucher = Voucher::query()->first();
+        $comments = $voucher->comments;
+        self::assertCount(1, $comments);
+        foreach ($comments as $comment)
+        {
+            self::assertEquals(Voucher::class, $comment->commentable_type);
+            self::assertEquals($voucher->id, $comment->commentable_id);
+        }
+
+    }
+
+    public function testManyToManyPolymorphic()
+    {
+
+        $this->seed([CategorySeeder::class, ProductSeeder::class, VoucherSeeder::class, TagSeeder::class]);
+
+        $product = Product::query()->first();
+        $tags = $product->tags;
+        self::assertNotNull($tags);
+        self::assertCount(1, $tags);
+
+        foreach ($tags as $tag)
+        {
+            self::assertNotNull($tag);
+            self::assertNotNull($tag->id);
+            self::assertNotNull($tag->name);
+        }
 
     }
 
